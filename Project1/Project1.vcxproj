@@ -73,9 +73,17 @@
     <ClInclude Include="..\..\..\..\Lab4\GL+Files\GL Files\include\GL\glui.h" />
     <ClInclude Include="..\..\..\..\Lab4\GL+Files\GL Files\include\GL\glut.h" />
     <ClInclude Include="CImg.h" />
+    <ClInclude Include="SOIL.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Lab4\Lab3D\Lab3D\Project2\Bezier.cpp" />
+    <ClCompile Include="Bezier.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="texture.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bezier.dat" />
+    <None Include="libSOIL.a" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
