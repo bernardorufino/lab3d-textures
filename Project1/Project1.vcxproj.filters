@@ -45,9 +45,6 @@
     <ClInclude Include="CImg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SOIL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bezier.cpp">
@@ -58,9 +55,11 @@
     <Image Include="texture.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="texture_old.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="bezier.dat" />
-    <None Include="libSOIL.a" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <string>
 #include <iostream>
@@ -8,7 +9,6 @@
 using namespace std;
 #include "CImg.h" 
 using namespace cimg_library;
-#include "SOIL.h"
 
 #define PI 3.14159265358979323846
 #define sqr(x) ((x)*(x))
@@ -129,7 +129,7 @@ public:
 	void Set(CPoint3D p0, CPoint3D p, CPoint3D up)
 	{
 		P0 = p0; At = p; Up = up;
-		AngX = 0.0f; AngY = 0.0f;  AngZ = 0.0f;
+		AngX = 0.0; AngY = 0.0f;  AngZ = 0.0f;
 	}
 
 	void Zoom(float amount) {
@@ -372,13 +372,13 @@ void BezierRecursiveSubdivision(point3D_type* a, GLint n, GLint m, int depth = 0
 void initlights(void)
 {
 	GLfloat ambient[] =
-	{ 0.1, 0.7, 0.7, 1.0 };
+	{ 0.2, 0.2, 0.2, 1.0 };
 	GLfloat position[] =
-	{ 0.0, 0.0, 3.0, 2.0 };
+	{ 3.0, 0.0, 3.0, 2.0 };
 	GLfloat mat_diffuse[] =
-	{ 0.1, 0.9, 0.9, 1.0 };
+	{ 0.4, 0.4, 0.4, 0.4 };
 	GLfloat mat_specular[] =
-	{ 1.0, 1.0, 1.0, 1.0 };
+	{ 0.4, 0.4, 0.4, 0.4 };
 	GLfloat mat_shininess[] =
 	{ 50.0 };
 
@@ -391,6 +391,7 @@ void initlights(void)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+	glEnable(GL_COLOR_MATERIAL);
 }
 
 void inittextures(void)
@@ -400,30 +401,20 @@ void inittextures(void)
 	{ { 1.0, 0.0 }, { 1.0, 1.0 } } };
 
 	CImg<unsigned char> src("texture.bmp");
-	src.mirror("y");
 
 	glGenTextures(1, &texid);
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
 	glBindTexture(GL_TEXTURE_2D, texid);
-
 	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, src.width(), src.height(), GL_LUMINANCE, GL_UNSIGNED_BYTE, src.data());
-
 	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
 	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
-
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	glMap2f(GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, &texpts[0][0][0]);
-
 	glEnable(GL_MAP2_TEXTURE_COORD_2);
-
 	glEnable(GL_TEXTURE_2D);
-
 }
 
 float ratio = 1.0;
@@ -439,7 +430,6 @@ void DrawControlPoints(point3D_type* points, int n, int m) {
 			point3D_type p = points[j*n + i];
 			glPushMatrix();
 			glTranslatef(p.x, p.y, p.z);
-			glColor3f(1.0f, 0.2f, 0.2f);
 			glutSolidSphere(0.01, 10, 10);
 			glPopMatrix();
 		}
@@ -468,13 +458,12 @@ void display(void)
 	{
 		DrawControlPoints(ctrlpoints, N, M);
 	}
-
 	BezierRecursiveSubdivision(ctrlpoints, N, M);
 
 	glPopMatrix();
 
 	glFlush();
-	glutSwapBuffers(); // display the screen just made 
+	glutSwapBuffers();
 }
 
 float angle = 0.0;
@@ -483,7 +472,8 @@ float lx = 0.0f, ly = 0.0f, lz = -1.0f;
 
 void myinit(void)
 {
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glColor3f(0.56, 0.35, 0.16);
+
 	glEnable(GL_DEPTH_TEST);
 	glMap2f(GL_MAP2_VERTEX_3, 0, 1, 3, 4, 0, 1, 12, 4, &(GLfloat &)ctrlpoints);
 	glEnable(GL_MAP2_VERTEX_3);
@@ -493,10 +483,10 @@ void myinit(void)
 	cam.Set(
 		CPoint3D(x, y, z),
 		CPoint3D(x + lx, y + ly, z + lz),
-		CPoint3D(0.0f, 1.0f, 0.0f));
+		CPoint3D(0.0f, 0.0f, 0.0f));
 
 	glMapGrid2f(n, 0.0, 1.0, n, 0.0, 1.0);
-	initlights();       /* for lighted version only */
+	initlights();
 	inittextures();
 }
 
@@ -586,7 +576,7 @@ void inputKey(unsigned char c, int x, int y) {
 
 int main(int argc, char **argv)
 {
-	/*
+	/* //User input name of file
 	bool loaded;
 	do {
 		cout << "Enter bezier control points file: ";
@@ -597,12 +587,10 @@ int main(int argc, char **argv)
 	*/
 	string filename = "bezier.dat";
 	LoadBezier((char*)filename.c_str(), &ctrlpoints, &N, &M);
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutCreateWindow(argv[0]);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-
 	myinit();
 
 	glutReshapeFunc(myReshape);
@@ -610,6 +598,7 @@ int main(int argc, char **argv)
 
 	glutKeyboardFunc(inputKey);
 	glutMouseFunc(mouse);
+	float size = 1.f;
 	glutMainLoop();
 	return 0;             /* ANSI C requires main to return int. */
 }
